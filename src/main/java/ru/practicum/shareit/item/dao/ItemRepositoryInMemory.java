@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.dao;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
@@ -12,7 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Component
-public class ItemStorageInMemory implements ItemStorage {
+public class ItemRepositoryInMemory implements ItemRepository {
 
 	private final Map<Long, Item> items = new HashMap<>();
 
@@ -33,9 +32,6 @@ public class ItemStorageInMemory implements ItemStorage {
 
 	@Override
 	public Item update(Item updateItem) {
-		if (updateItem.getId() == null) {
-			throw new ValidationException("Id элемента должен быть указан");
-		}
 		if (!items.containsKey(updateItem.getId())) {
 			throw new NotFoundException("Элемент с id = " + updateItem.getId() + " не найден");
 		}
@@ -44,12 +40,11 @@ public class ItemStorageInMemory implements ItemStorage {
 	}
 
 	@Override
-	public Item delete(Long id) {
+	public void delete(Long id) {
 		Optional<Item> optionalItem = Optional.ofNullable(items.remove(id));
 		if (optionalItem.isEmpty()) {
 			throw new NotFoundException("Элемент с id = " + id + " не найден");
 		}
-		return optionalItem.get();
 	}
 
 	@Override

@@ -1,11 +1,10 @@
 package ru.practicum.shareit.item.dao;
 
-
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
 
-public interface ItemStorage {
+public interface ItemRepository {
 
 	Item get(Long id);
 
@@ -13,7 +12,7 @@ public interface ItemStorage {
 
 	Item update(Item updateItem);
 
-	Item delete(Long id);
+	void delete(Long id);
 
 	Collection<Item> getByUserId(Long userId);
 

@@ -6,9 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @Builder
 @EqualsAndHashCode(of = {"email"})

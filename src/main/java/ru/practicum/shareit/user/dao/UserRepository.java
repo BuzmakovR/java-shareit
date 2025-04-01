@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.dao;
 
 import ru.practicum.shareit.user.model.User;
 
-public interface UserStorage {
+public interface UserRepository {
 
 	User get(Long id);
 
@@ -10,7 +10,7 @@ public interface UserStorage {
 
 	User update(User newUser);
 
-	User delete(Long id);
+	void delete(Long id);
 
 	boolean checkExistsOtherUserByParams(Long userId, String email);
 }

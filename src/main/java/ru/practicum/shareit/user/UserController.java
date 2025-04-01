@@ -14,12 +14,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.user.dto.UpdateUserRequest;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -34,8 +30,8 @@ public class UserController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public UserDto create(@Valid @RequestBody User user) {
-		return userService.addUser(user);
+	public UserDto create(@Valid @RequestBody UserDto userDto) {
+		return userService.addUser(userDto);
 	}
 
 	@PatchMapping("/{userId}")
@@ -44,7 +40,7 @@ public class UserController {
 	}
 
 	@DeleteMapping("/{id}")
-	public UserDto delete(@PathVariable("id") long userId) {
-		return userService.deleteUser(userId);
+	public void delete(@PathVariable("id") long userId) {
+		userService.deleteUser(userId);
 	}
 }

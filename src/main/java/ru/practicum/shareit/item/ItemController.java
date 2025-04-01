@@ -16,14 +16,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collection;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
@@ -51,7 +47,7 @@ public class ItemController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ItemDto create(@RequestHeader("X-Sharer-User-Id") long userId,
-						  @Valid @RequestBody Item item) {
+						  @Valid @RequestBody ItemDto item) {
 		return itemService.addItem(item, userId);
 	}
 
@@ -63,9 +59,9 @@ public class ItemController {
 	}
 
 	@DeleteMapping("/{itemId}")
-	public ItemDto delete(@RequestHeader("X-Sharer-User-Id") long userId,
+	public void delete(@RequestHeader("X-Sharer-User-Id") long userId,
 						  @PathVariable long itemId) {
-		return itemService.deleteItem(itemId, userId);
+		itemService.deleteItem(itemId, userId);
 	}
 
 }

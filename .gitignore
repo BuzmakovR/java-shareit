@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### custom ###
-./tests/
+tests/

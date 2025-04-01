@@ -3,12 +3,12 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dao.ItemStorage;
+import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.dao.UserStorage;
+import ru.practicum.shareit.user.dao.UserRepository;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,25 +18,31 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-	private final ItemStorage itemStorage;
+	private final ItemRepository itemRepository;
 
-	private final UserStorage userStorage;
+	private final UserRepository userRepository;
 
 	@Override
 	public ItemDto getItem(Long id) {
-		return ItemMapper.toItemDto(itemStorage.get(id));
+		return ItemMapper.toItemDto(itemRepository.get(id));
 	}
 
 	@Override
-	public ItemDto addItem(Item item, Long ownerId) {
-		userStorage.get(ownerId);
-		item.setOwnerId(ownerId);
-		return ItemMapper.toItemDto(itemStorage.add(item));
+	public ItemDto addItem(ItemDto itemDto, Long ownerId) {
+		userRepository.get(ownerId);
+		Item item = Item.builder()
+				.ownerId(ownerId)
+				.name(itemDto.getName())
+				.description(itemDto.getDescription())
+				.isAvailable(itemDto.getIsAvailable())
+				.request(itemDto.getRequest())
+				.build();
+		return ItemMapper.toItemDto(itemRepository.add(item));
 	}
 
 	@Override
 	public ItemDto updateItem(Long itemId, UpdateItemRequest itemRequest, Long userId) {
-		Item item = itemStorage.get(itemId);
+		Item item = itemRepository.get(itemId);
 		if (!Objects.equals(item.getOwnerId(), userId)) {
 			throw new NotFoundException("Не найден элемент для обновления для текущего пользователя");
 		}
@@ -49,18 +55,18 @@ public class ItemServiceImpl implements ItemService {
 		if (itemRequest.getIsAvailable() != null) {
 			item.setIsAvailable(itemRequest.getIsAvailable());
 		}
-		return ItemMapper.toItemDto(itemStorage.update(item));
+		return ItemMapper.toItemDto(itemRepository.update(item));
 	}
 
 	@Override
-	public ItemDto deleteItem(Long id, Long userId) {
-		return ItemMapper.toItemDto(itemStorage.delete(id));
+	public void deleteItem(Long id, Long userId) {
+		itemRepository.delete(id);
 	}
 
 	@Override
 	public Collection<ItemDto> getItemsByUser(Long userId) {
-		userStorage.get(userId);
-		return itemStorage.getByUserId(userId).stream()
+		userRepository.get(userId);
+		return itemRepository.getByUserId(userId).stream()
 				.map(ItemMapper::toItemDto)
 				.toList();
 	}
@@ -70,7 +76,7 @@ public class ItemServiceImpl implements ItemService {
 		if (name == null || name.isBlank()) {
 			return List.of();
 		}
-		return itemStorage.search(name).stream()
+		return itemRepository.search(name).stream()
 				.map(ItemMapper::toItemDto)
 				.toList();
 	}
