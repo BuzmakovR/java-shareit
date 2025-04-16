@@ -12,7 +12,7 @@ import java.util.Collection;
 
 @Data
 @Builder
-public class ItemDto {
+public class ItemOwnerDto {
 
 	private Long id;
 

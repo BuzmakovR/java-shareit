@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -28,7 +30,7 @@ public class ItemController {
 	private final ItemService itemService;
 
 	@GetMapping()
-	public Collection<ItemDto> get(@RequestHeader("X-Sharer-User-Id") long userId) {
+	public Collection<ItemOwnerDto> get(@RequestHeader("X-Sharer-User-Id") long userId) {
 		return itemService.getItemsByUser(userId);
 	}
 
@@ -51,6 +53,14 @@ public class ItemController {
 		return itemService.addItem(item, userId);
 	}
 
+	@PostMapping("/{itemId}/comment")
+	@ResponseStatus(HttpStatus.CREATED)
+	public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") long userId,
+									@PathVariable long itemId,
+									@Valid @RequestBody CommentDto commentDto) {
+		return itemService.addComment(commentDto, itemId, userId);
+	}
+
 	@PatchMapping("/{itemId}")
 	public ItemDto update(@RequestHeader("X-Sharer-User-Id") long userId,
 						  @PathVariable long itemId,
@@ -60,7 +70,7 @@ public class ItemController {
 
 	@DeleteMapping("/{itemId}")
 	public void delete(@RequestHeader("X-Sharer-User-Id") long userId,
-						  @PathVariable long itemId) {
+					   @PathVariable long itemId) {
 		itemService.deleteItem(itemId, userId);
 	}
 
