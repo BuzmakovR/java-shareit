@@ -16,7 +16,6 @@ public class BookingRequestDto {
 	private Long itemId;
 
 	@NotNull(message = "Дата начала бронирования не может быть пустой")
-	@FutureOrPresent
 	private LocalDateTime start;
 
 	@NotNull(message = "Дата конца бронирования не может быть пустой")
