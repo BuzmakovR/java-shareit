@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-	private final String NOT_FOUND_ITEM_BY_ID = "Элемент не найден: ID = %d";
-	private final String NOT_FOUND_USER_BY_ID = "Пользователь не найден: ID = %d";
+	private static final String NOT_FOUND_ITEM_BY_ID = "Элемент не найден: ID = %d";
+	private static final String NOT_FOUND_USER_BY_ID = "Пользователь не найден: ID = %d";
 
 	private final ItemRepository itemRepository;
 

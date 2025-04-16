@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 
-	private final String NOT_FOUND_USER_BY_ID = "Пользователь не найден: ID = %d";
+	private static final String NOT_FOUND_USER_BY_ID = "Пользователь не найден: ID = %d";
 
 	@Override
 	public UserDto getUser(Long id) {

@@ -26,9 +26,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-	private final String NOT_FOUND_BOOKING_BY_ID = "Запрос бронирования не найден: ID = %d";
-	private final String NOT_FOUND_USER_BY_ID = "Пользователь не найден: ID = %d";
-	private final String NOT_FOUND_ITEM_BY_ID = "Элемент не найден: ID = %d";
+	private static final String NOT_FOUND_BOOKING_BY_ID = "Запрос бронирования не найден: ID = %d";
+	private static final String NOT_FOUND_USER_BY_ID = "Пользователь не найден: ID = %d";
+	private static final String NOT_FOUND_ITEM_BY_ID = "Элемент не найден: ID = %d";
 
 	private final BookingRepository bookingRepository;
 
