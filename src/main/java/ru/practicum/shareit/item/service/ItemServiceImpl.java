@@ -9,6 +9,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CreateItemRequest;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
@@ -16,6 +17,8 @@ import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.dao.ItemRequestRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -32,6 +35,7 @@ public class ItemServiceImpl implements ItemService {
 
 	private static final String NOT_FOUND_ITEM_BY_ID = "Элемент не найден: ID = %d";
 	private static final String NOT_FOUND_USER_BY_ID = "Пользователь не найден: ID = %d";
+	private static final String NOT_FOUND_ITEM_REQUEST_BY_ID = "Запрос не найден: ID = %d";
 
 	private final ItemRepository itemRepository;
 
@@ -40,6 +44,8 @@ public class ItemServiceImpl implements ItemService {
 	private final BookingRepository bookingRepository;
 
 	private final CommentRepository commentRepository;
+
+	private final ItemRequestRepository itemRequestRepository;
 
 	@Override
 	public ItemDto getItem(Long id) {
@@ -52,12 +58,16 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 	@Override
-	public ItemDto addItem(ItemDto itemDto, Long ownerId) {
+	public ItemDto addItem(CreateItemRequest createItemRequest, Long ownerId) {
 		Optional<User> optionalUser = userRepository.findById(ownerId);
 		User owner = optionalUser.orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, ownerId));
 
-		Item item = ItemMapper.fromItemDto(itemDto, owner);
-		return ItemMapper.toItemDto(itemRepository.saveAndFlush(item));
+		ItemRequest itemRequest = null;
+		if (createItemRequest.getRequestId() != null) {
+			Optional<ItemRequest> optionalItemRequest = itemRequestRepository.findById(createItemRequest.getRequestId());
+			itemRequest = optionalItemRequest.orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_REQUEST_BY_ID, createItemRequest.getRequestId()));
+		}
+		return ItemMapper.toItemDto(ItemMapper.fromCreateItemRequest(createItemRequest, owner, itemRequest));
 	}
 
 	@Override

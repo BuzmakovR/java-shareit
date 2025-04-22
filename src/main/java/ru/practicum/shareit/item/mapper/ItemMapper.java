@@ -1,10 +1,12 @@
 package ru.practicum.shareit.item.mapper;
 
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.dto.CreateItemRequest;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -48,6 +50,15 @@ public class ItemMapper {
 		Item item = fromItemDto(itemDto);
 		item.setOwner(owner);
 		return item;
+	}
+
+	public static Item fromCreateItemRequest(CreateItemRequest createItemRequest, User owner, ItemRequest itemRequest) {
+		return Item.builder()
+				.name(createItemRequest.getName())
+				.description(createItemRequest.getDescription())
+				.isAvailable(createItemRequest.getIsAvailable())
+				.request(itemRequest)
+				.build();
 	}
 
 	public static ItemOwnerDto toItemOwnerDto(Item item, Collection<Booking> bookings, Collection<Comment> comments) {

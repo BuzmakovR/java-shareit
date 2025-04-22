@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CreateItemRequest;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.dto.UpdateItemRequest;
@@ -49,8 +50,8 @@ public class ItemController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ItemDto create(@RequestHeader("X-Sharer-User-Id") long userId,
-						  @Valid @RequestBody ItemDto item) {
-		return itemService.addItem(item, userId);
+						  @Valid @RequestBody CreateItemRequest createItemRequest) {
+		return itemService.addItem(createItemRequest, userId);
 	}
 
 	@PostMapping("/{itemId}/comment")
