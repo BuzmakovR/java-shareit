@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +34,7 @@ public class BookingController {
 
 	@GetMapping
 	public Collection<BookingDto> getBookingsByUser(@RequestHeader("X-Sharer-User-Id") long userId,
-													@RequestParam(required = false, defaultValue = "ALL") BookingState state) {
+													@RequestParam(required = false, defaultValue = "all") BookingState state) {
 		return bookingService.getBookingsByUserIdAndState(userId, state);
 	}
 
@@ -48,11 +47,11 @@ public class BookingController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public BookingDto create(@RequestHeader("X-Sharer-User-Id") long userId,
-							 @Valid @RequestBody BookingRequestDto bookingRequestDto) {
+							 @RequestBody BookingRequestDto bookingRequestDto) {
 		return bookingService.addBooking(bookingRequestDto, userId);
 	}
 
-	@PatchMapping("/{bookingId}") // ?approved={approved}
+	@PatchMapping("/{bookingId}")
 	public BookingDto update(@RequestHeader("X-Sharer-User-Id") long userId,
 							 @PathVariable Long bookingId,
 							 @RequestParam Boolean approved) {

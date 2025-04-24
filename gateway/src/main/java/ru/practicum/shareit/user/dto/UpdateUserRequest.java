@@ -1,11 +1,13 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.Getter;
+import jakarta.validation.constraints.Email;
+import lombok.Data;
 
-@Getter
+@Data
 public class UpdateUserRequest {
 
 	private String name;
 
+	@Email
 	private String email;
 }

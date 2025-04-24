@@ -16,6 +16,7 @@ import ru.practicum.shareit.client.BaseClient;
 
 @Service
 public class BookingClient extends BaseClient {
+
 	private static final String API_PREFIX = "/bookings";
 
 	@Autowired
@@ -37,12 +38,19 @@ public class BookingClient extends BaseClient {
 		return get("?state={state}&from={from}&size={size}", userId, parameters);
 	}
 
-
 	public ResponseEntity<Object> bookItem(long userId, BookItemRequestDto requestDto) {
 		return post("", userId, requestDto);
 	}
 
 	public ResponseEntity<Object> getBooking(long userId, Long bookingId) {
 		return get("/" + bookingId, userId);
+	}
+
+	public ResponseEntity<Object> getBookingsByItemOwnerIdAndState(long userId, BookingState bookingState) {
+		return get("/owner?state={state}", userId, Map.of("state", bookingState));
+	}
+
+	public ResponseEntity<Object> approveBooking(long bookingId, long userId, boolean approved) {
+		return patch("/" + bookingId + "?approved={approved}", userId, Map.of("approved", approved), null);
 	}
 }
