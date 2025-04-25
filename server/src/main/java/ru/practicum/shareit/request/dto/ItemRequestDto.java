@@ -6,6 +6,7 @@ import ru.practicum.shareit.item.dto.ItemForRequestDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
@@ -20,5 +21,6 @@ public class ItemRequestDto {
 
 	private LocalDateTime created;
 
-	private Collection<ItemForRequestDto> items;
+	@Builder.Default
+	private Collection<ItemForRequestDto> items = new ArrayList<>();
 }

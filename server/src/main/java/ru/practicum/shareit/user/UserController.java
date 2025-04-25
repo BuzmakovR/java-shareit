@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,7 +34,7 @@ public class UserController {
 	}
 
 	@PatchMapping("/{userId}")
-	public UserDto update(@PathVariable long userId, @Valid @RequestBody UpdateUserRequest userRequest) {
+	public UserDto update(@PathVariable long userId, @RequestBody UpdateUserRequest userRequest) {
 		return userService.updateUser(userId, userRequest);
 	}
 

@@ -27,5 +27,5 @@ public class ItemDto {
 
 	private LocalDateTime nextBooking;
 
-	Collection<CommentDto> comments;
+	private Collection<CommentDto> comments;
 }

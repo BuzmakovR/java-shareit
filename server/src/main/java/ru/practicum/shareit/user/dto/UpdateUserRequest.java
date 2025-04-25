@@ -1,8 +1,10 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
+@Data
+@Builder
 public class UpdateUserRequest {
 
 	private String name;

@@ -13,6 +13,7 @@ import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -50,13 +51,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 		Set<Long> requestIds = itemRequests.stream()
 				.map(ItemRequest::getId)
 				.collect(Collectors.toSet());
-		Map<Long, List<Item>> itemsByRequestIds = new HashMap<>();
-		itemRepository.findAllByRequestIdIn(requestIds)
-				.forEach(item -> {
-					List<Item> itemsByRequestId = itemsByRequestIds.getOrDefault(item.getRequest().getId(), List.of());
-					itemsByRequestId.add(item);
-					itemsByRequestIds.put(item.getRequest().getId(), itemsByRequestId);
-				});
+		Map<Long, List<Item>> itemsByRequestIds = getItemsByRequestIds(requestIds);
 		return itemRequests.stream()
 				.map(itemRequest -> ItemRequestMapper.toItemRequestDto(itemRequest, itemsByRequestIds.getOrDefault(itemRequest.getId(), List.of())))
 				.toList();
@@ -69,13 +64,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 		Set<Long> requestIds = itemRequests.stream()
 				.map(ItemRequest::getId)
 				.collect(Collectors.toSet());
-		Map<Long, List<Item>> itemsByRequestIds = new HashMap<>();
-		itemRepository.findAllByRequestIdIn(requestIds)
-				.forEach(item -> {
-					List<Item> itemsByRequestId = itemsByRequestIds.getOrDefault(item.getRequest().getId(), List.of());
-					itemsByRequestId.add(item);
-					itemsByRequestIds.put(item.getRequest().getId(), itemsByRequestId);
-				});
+		Map<Long, List<Item>> itemsByRequestIds = getItemsByRequestIds(requestIds);
 		return itemRequests.stream()
 				.map(itemRequest -> ItemRequestMapper.toItemRequestDto(itemRequest, itemsByRequestIds.getOrDefault(itemRequest.getId(), List.of())))
 				.toList();
@@ -89,5 +78,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 		ItemRequest itemRequest = ItemRequestMapper.fromItemRequestDto(itemRequestDto, owner);
 		itemRequest.setCreated(LocalDateTime.now());
 		return ItemRequestMapper.toItemRequestDto(itemRequestRepository.saveAndFlush(itemRequest));
+	}
+
+	private Map<Long, List<Item>> getItemsByRequestIds(Set<Long> requestIds) {
+		Map<Long, List<Item>> itemsByRequestIds = new HashMap<>();
+		itemRepository.findAllByRequestIdIn(requestIds)
+				.forEach(item -> {
+					List<Item> itemsByRequestId = itemsByRequestIds.getOrDefault(item.getRequest().getId(), new ArrayList<>());
+					itemsByRequestId.add(item);
+					itemsByRequestIds.put(item.getRequest().getId(), itemsByRequestId);
+				});
+		return itemsByRequestIds;
 	}
 }

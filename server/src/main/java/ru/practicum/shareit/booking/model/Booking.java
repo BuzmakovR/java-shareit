@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,15 +36,12 @@ public class Booking {
 	@Column(name = "end_date", nullable = false)
 	private LocalDateTime end;
 
-	@NotNull
 	@ManyToOne
 	private Item item;
 
-	@NotNull
 	@ManyToOne
 	private User booker;
 
-	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
 	private BookingStatus status;
