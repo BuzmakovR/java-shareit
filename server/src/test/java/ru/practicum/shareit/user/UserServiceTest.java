@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UpdateUserRequest;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -76,6 +77,14 @@ public class UserServiceTest {
 		assertEquals(userDto.getName(), userDtoCreated.getName());
 		assertEquals(userDto.getEmail(), userDtoCreated.getEmail());
 		verify(userRepository, times(1)).saveAndFlush(any());
+	}
+
+	@Test
+	void addUserWithoutEmail() {
+		User user = getNewUser();
+		user.setEmail("");
+		UserDto userDto = UserMapper.toUserDto(user);
+		assertThrows(ValidationException.class, () -> userService.addUser(userDto));
 	}
 
 	@Test

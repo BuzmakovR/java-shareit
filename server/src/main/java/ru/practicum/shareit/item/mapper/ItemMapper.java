@@ -47,12 +47,6 @@ public class ItemMapper {
 				.build();
 	}
 
-	public static Item fromItemDto(ItemDto itemDto, User owner) {
-		Item item = fromItemDto(itemDto);
-		item.setOwner(owner);
-		return item;
-	}
-
 	public static Item fromCreateItemRequest(CreateItemRequest createItemRequest, User owner, ItemRequest itemRequest) {
 		return Item.builder()
 				.name(createItemRequest.getName())

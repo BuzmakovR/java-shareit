@@ -15,11 +15,14 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.request.dao.ItemRequestRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -43,6 +46,9 @@ public class ItemServiceTest {
 
 	@Mock
 	private ItemRepository itemRepository;
+
+	@Mock
+	private ItemRequestRepository itemRequestRepository;
 
 	@Mock
 	private CommentRepository commentRepository;
@@ -74,6 +80,45 @@ public class ItemServiceTest {
 		assertEquals(createItemRequest.getName(), itemDtoCreated.getName());
 		assertEquals(createItemRequest.getDescription(), itemDtoCreated.getDescription());
 		verify(userRepository, times(1)).findById(anyLong());
+		verify(itemRepository, times(1)).saveAndFlush(any());
+	}
+
+	@Test
+	void addItemWithRequest() {
+		UserDto userDto = getNewUserDto();
+		User user = UserMapper.fromUserDto(userDto);
+		User requestor = UserMapper.fromUserDto(getNewUserDto());
+		CreateItemRequest createItemRequest = createItemRequest();
+		ItemRequest itemRequest = ItemRequest.builder()
+				.id(1L)
+				.created(LocalDateTime.now())
+				.requestor(requestor)
+				.description("test")
+				.build();
+		createItemRequest.setRequestId(itemRequest.getId());
+		Item item = Item.builder()
+				.id(itemCount++)
+				.name(createItemRequest().getName())
+				.description(createItemRequest().getDescription())
+				.isAvailable(createItemRequest.getIsAvailable())
+				.request(itemRequest)
+				.build();
+
+		when(userRepository.findById(anyLong()))
+				.thenReturn(Optional.of(user));
+
+		when(itemRequestRepository.findById(anyLong()))
+				.thenReturn(Optional.of(itemRequest));
+
+		when(itemRepository.saveAndFlush(ItemMapper.fromCreateItemRequest(createItemRequest, user, itemRequest)))
+				.thenReturn(item);
+
+		ItemDto itemDtoCreated = itemService.addItem(createItemRequest, user.getId());
+		assertNotNull(itemDtoCreated);
+		assertEquals(createItemRequest.getName(), itemDtoCreated.getName());
+		assertEquals(createItemRequest.getDescription(), itemDtoCreated.getDescription());
+		verify(userRepository, times(1)).findById(anyLong());
+		verify(itemRequestRepository, times(1)).findById(anyLong());
 		verify(itemRepository, times(1)).saveAndFlush(any());
 	}
 

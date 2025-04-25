@@ -13,6 +13,9 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.ConditionsNotMetException;
+import ru.practicum.shareit.exception.NoRightsException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CreateItemRequest;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -24,6 +27,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(classes = ShareItServer.class)
 @AutoConfigureTestDatabase
@@ -70,6 +74,24 @@ public class BookingControllerIntegrationTest {
 	}
 
 	@Test
+	void createBookingWithIsNotAvailableItem() {
+		UserDto userDto = userService.addUser(getNewUserDto());
+		UserDto bookerDto = userService.addUser(getNewUserDto());
+		CreateItemRequest createItemRequest = createItemRequest();
+		createItemRequest.setIsAvailable(false);
+		ItemDto item = itemService.addItem(createItemRequest, userDto.getId());
+		BookingRequestDto bookingRequestDto = BookingRequestDto.builder()
+				.itemId(item.getId())
+				.start(LocalDateTime.now().plusSeconds(1))
+				.end(LocalDateTime.now().plusSeconds(2))
+				.build();
+
+		assertThrows(ConditionsNotMetException.class, () -> {
+			bookingController.create(bookerDto.getId(), bookingRequestDto);
+		});
+	}
+
+	@Test
 	void updateBooking() {
 		UserDto userDto = userService.addUser(getNewUserDto());
 		UserDto bookerDto = userService.addUser(getNewUserDto());
@@ -90,6 +112,12 @@ public class BookingControllerIntegrationTest {
 		assertNotNull(bookingDto);
 		assertNotNull(bookingDto.getStatus());
 		assertEquals(BookingStatus.APPROVED, bookingDto.getStatus());
+
+		UserDto anotherUserDto = userService.addUser(getNewUserDto());
+		Long bookingId = bookingDto.getId();
+		assertThrows(NoRightsException.class, () -> {
+			bookingController.update(anotherUserDto.getId(), bookingId, false);
+		});
 	}
 
 	@Test
@@ -114,12 +142,34 @@ public class BookingControllerIntegrationTest {
 			bookingDtoGet = bookingController.get(bookerDto.getId(), bookingDto.getId());
 			bookingByUser = bookingController.getBookingsByUser(bookerDto.getId(), BookingState.ALL);
 			bookingByItemOwner = bookingController.getBookingsByItemOwner(userDto.getId(), BookingState.ALL);
+
+			bookingController.getBookingsByUser(bookerDto.getId(), BookingState.CURRENT);
+			bookingController.getBookingsByItemOwner(userDto.getId(), BookingState.CURRENT);
+
+			bookingController.getBookingsByUser(bookerDto.getId(), BookingState.PAST);
+			bookingController.getBookingsByItemOwner(userDto.getId(), BookingState.PAST);
+
+			bookingController.getBookingsByUser(bookerDto.getId(), BookingState.FUTURE);
+			bookingController.getBookingsByItemOwner(userDto.getId(), BookingState.FUTURE);
+
+			bookingController.getBookingsByUser(bookerDto.getId(), BookingState.WAITING);
+			bookingController.getBookingsByItemOwner(userDto.getId(), BookingState.WAITING);
+
+			bookingController.getBookingsByUser(bookerDto.getId(), BookingState.REJECTED);
+			bookingController.getBookingsByItemOwner(userDto.getId(), BookingState.REJECTED);
 		} catch (Exception e) {
 			Assertions.fail(e.getMessage());
 		}
 		assertNotNull(bookingDtoGet);
 		assertNotNull(bookingByUser);
 		assertNotNull(bookingByItemOwner);
+
+		UserDto anotherUser = userService.addUser(getNewUserDto());
+
+		Long bookingId = bookingDto.getId();
+		assertThrows(NotFoundException.class, () -> {
+			bookingController.get(anotherUser.getId(), bookingId);
+		});
 	}
 
 	private UserDto getNewUserDto() {

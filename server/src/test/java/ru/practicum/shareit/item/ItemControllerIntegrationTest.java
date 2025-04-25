@@ -11,6 +11,7 @@ import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CreateItemRequest;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -112,6 +113,16 @@ public class ItemControllerIntegrationTest {
 	}
 
 	@Test
+	void getNotExistsItem() {
+		UserDto userDto = userService.addUser(getNewUserDto());
+		CreateItemRequest createItemRequest = createItemRequest();
+		ItemDto item = itemController.create(userDto.getId(), createItemRequest);
+		Assertions.assertThrows(NotFoundException.class, () -> {
+			itemController.get(userDto.getId(), item.getId() + 1);
+		});
+	}
+
+	@Test
 	void getItemsByUser() {
 		UserDto userDto = userService.addUser(getNewUserDto());
 		CreateItemRequest createItemRequest = createItemRequest();
@@ -133,14 +144,19 @@ public class ItemControllerIntegrationTest {
 		CreateItemRequest createItemRequest = createItemRequest();
 		ItemDto itemDto = itemController.create(userDto.getId(), createItemRequest);
 		Collection<ItemDto> itemDtoResult = null;
+		Collection<ItemDto> itemDtoEmptyResult = null;
 		try {
 			itemDtoResult = itemController.search(userDto.getId(), "name");
+			itemDtoEmptyResult = itemController.search(userDto.getId(), "");
 		} catch (Exception e) {
 			Assertions.fail(e.getMessage());
 		}
 		assertNotNull(itemDtoResult);
 		assertEquals(1, itemDtoResult.size());
 		assertEquals(itemDto, itemDtoResult.stream().toList().getFirst());
+
+		assertNotNull(itemDtoEmptyResult);
+		assertEquals(0, itemDtoEmptyResult.size());
 	}
 
 	@Test
