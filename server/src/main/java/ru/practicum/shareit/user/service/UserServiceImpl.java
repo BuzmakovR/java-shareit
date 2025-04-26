@@ -37,9 +37,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto updateUser(Long userId, UpdateUserRequest userRequest) {
-		Optional<User> optionalUser = userRepository.findById(userId);
-		User user = optionalUser.orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, userId));
-
+		User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, userId));
 		if (userRequest.getName() != null && !userRequest.getName().isBlank()) {
 			user.setName(userRequest.getName());
 		}

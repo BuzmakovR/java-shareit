@@ -38,7 +38,7 @@ public class ItemRequestControllerIntegrationTest {
 		UserDto userDto = userService.addUser(getNewUserDto());
 		ItemRequestDto itemRequestDto = getNewItemRequestDto(userDto);
 		try {
-			itemRequestDto = itemRequestController.create(itemRequestDto.getRequestor().getId(), itemRequestDto);
+			itemRequestDto = itemRequestController.create(itemRequestDto, itemRequestDto.getRequestor().getId());
 		} catch (Exception e) {
 			Assertions.fail(e.getMessage());
 		}
@@ -49,10 +49,10 @@ public class ItemRequestControllerIntegrationTest {
 	void getItemRequest() {
 		UserDto userDto = userService.addUser(getNewUserDto());
 		ItemRequestDto itemRequestDto = getNewItemRequestDto(userDto);
-		itemRequestDto = itemRequestController.create(itemRequestDto.getRequestor().getId(), itemRequestDto);
+		itemRequestDto = itemRequestController.create(itemRequestDto, itemRequestDto.getRequestor().getId());
 		ItemRequestDto itemRequestDtoResult = null;
 		try {
-			itemRequestDtoResult = itemRequestController.get(itemRequestDto.getRequestor().getId(), itemRequestDto.getId());
+			itemRequestDtoResult = itemRequestController.get(itemRequestDto.getId(), itemRequestDto.getRequestor().getId());
 		} catch (Exception e) {
 			Assertions.fail(e.getMessage());
 		}
@@ -64,7 +64,7 @@ public class ItemRequestControllerIntegrationTest {
 	void getUserItemRequests() {
 		UserDto userDto = userService.addUser(getNewUserDto());
 		ItemRequestDto itemRequestDto = getNewItemRequestDto(userDto);
-		itemRequestDto = itemRequestController.create(itemRequestDto.getRequestor().getId(), itemRequestDto);
+		itemRequestDto = itemRequestController.create(itemRequestDto, itemRequestDto.getRequestor().getId());
 		Collection<ItemRequestDto> itemRequests = null;
 		try {
 			itemRequests = itemRequestController.get(itemRequestDto.getRequestor().getId());
@@ -80,11 +80,11 @@ public class ItemRequestControllerIntegrationTest {
 	void getOtherUserItemRequests() {
 		UserDto userDto = userService.addUser(getNewUserDto());
 		ItemRequestDto itemRequestDto = getNewItemRequestDto(userDto);
-		itemRequestDto = itemRequestController.create(itemRequestDto.getRequestor().getId(), itemRequestDto);
+		itemRequestDto = itemRequestController.create(itemRequestDto, itemRequestDto.getRequestor().getId());
 
 		UserDto otherUserDto = userService.addUser(getNewUserDto());
 		ItemRequestDto itemRequestDtoOtherUser = getNewItemRequestDto(otherUserDto);
-		itemRequestDtoOtherUser = itemRequestController.create(itemRequestDtoOtherUser.getRequestor().getId(), itemRequestDtoOtherUser);
+		itemRequestDtoOtherUser = itemRequestController.create(itemRequestDtoOtherUser, itemRequestDtoOtherUser.getRequestor().getId());
 
 		Collection<ItemRequestDto> itemRequests = null;
 		try {

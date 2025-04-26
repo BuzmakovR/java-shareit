@@ -20,7 +20,6 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +37,7 @@ public class BookingServiceImpl implements BookingService {
 
 	@Override
 	public BookingDto getBooking(Long bookingId, Long userId) {
-		Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
-		Booking booking = optionalBooking.orElseThrow(() -> new NotFoundException(NOT_FOUND_BOOKING_BY_ID, bookingId));
+		Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException(NOT_FOUND_BOOKING_BY_ID, bookingId));
 		if (Objects.equals(booking.getBooker().getId(), userId) || Objects.equals(booking.getItem().getOwner().getId(), userId)) {
 			return BookingMapper.toBookingDto(booking);
 		}
@@ -60,8 +58,7 @@ public class BookingServiceImpl implements BookingService {
 
 	@Override
 	public BookingDto approveBooking(Long bookingId, Long ownerId, Boolean approved) {
-		Optional<Booking> optionalBooking = bookingRepository.findByIdAndItemOwnerId(bookingId, ownerId);
-		Booking booking = optionalBooking.orElseThrow(NoRightsException::new);
+		Booking booking = bookingRepository.findByIdAndItemOwnerId(bookingId, ownerId).orElseThrow(NoRightsException::new);
 		booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
 		return BookingMapper.toBookingDto(bookingRepository.saveAndFlush(booking));
 	}

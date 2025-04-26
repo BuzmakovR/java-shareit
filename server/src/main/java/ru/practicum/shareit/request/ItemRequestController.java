@@ -28,8 +28,8 @@ public class ItemRequestController {
 	}
 
 	@GetMapping("/{requestId}")
-	public ItemRequestDto get(@RequestHeader("X-Sharer-User-Id") long userId,
-							  @PathVariable long requestId) {
+	public ItemRequestDto get(@PathVariable long requestId,
+			@RequestHeader("X-Sharer-User-Id") long userId) {
 		return itemRequestService.getItemRequest(requestId);
 	}
 
@@ -40,8 +40,8 @@ public class ItemRequestController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ItemRequestDto create(@RequestHeader("X-Sharer-User-Id") long userId,
-								 @RequestBody ItemRequestDto itemRequestDto) {
+	public ItemRequestDto create(@RequestBody ItemRequestDto itemRequestDto,
+								 @RequestHeader("X-Sharer-User-Id") long userId) {
 
 		return itemRequestService.addItemRequest(itemRequestDto, userId);
 	}

@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,11 +36,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
 	@Override
 	public ItemRequestDto getItemRequest(Long id) {
-		Optional<ItemRequest> optionalItemRequest = itemRequestRepository.findById(id);
-		if (optionalItemRequest.isEmpty()) {
-			throw new NotFoundException(NOT_FOUND_ITEM_REQUEST_BY_ID, id);
-		}
-		ItemRequest itemRequest = optionalItemRequest.get();
+		ItemRequest itemRequest = itemRequestRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_REQUEST_BY_ID, id));
 		return ItemRequestMapper.toItemRequestDto(itemRequest, itemRepository.findAllByRequestIdIn(Set.of(id)));
 	}
 
@@ -55,7 +50,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 		return itemRequests.stream()
 				.map(itemRequest -> ItemRequestMapper.toItemRequestDto(itemRequest, itemsByRequestIds.getOrDefault(itemRequest.getId(), List.of())))
 				.toList();
-
 	}
 
 	@Override
@@ -72,9 +66,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
 	@Override
 	public ItemRequestDto addItemRequest(ItemRequestDto itemRequestDto, Long ownerId) {
-		Optional<User> optionalUser = userRepository.findById(ownerId);
-		User owner = optionalUser.orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, ownerId));
-
+		User owner = userRepository.findById(ownerId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, ownerId));
 		ItemRequest itemRequest = ItemRequestMapper.fromItemRequestDto(itemRequestDto, owner);
 		itemRequest.setCreated(LocalDateTime.now());
 		return ItemRequestMapper.toItemRequestDto(itemRequestRepository.saveAndFlush(itemRequest));

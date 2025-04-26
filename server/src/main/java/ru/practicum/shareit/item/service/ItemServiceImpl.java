@@ -25,7 +25,6 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,23 +48,19 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public ItemDto getItem(Long id) {
-		Optional<Item> optionalItem = itemRepository.findById(id);
-		if (optionalItem.isEmpty()) {
-			throw new NotFoundException(NOT_FOUND_ITEM_BY_ID, id);
-		}
+		Item item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_BY_ID, id));
 		Collection<Comment> comments = commentRepository.findAllByItemIdIn(Set.of(id));
-		return ItemMapper.toItemDto(optionalItem.get(), comments);
+		return ItemMapper.toItemDto(item, comments);
 	}
 
 	@Override
 	public ItemDto addItem(CreateItemRequest createItemRequest, Long ownerId) {
-		Optional<User> optionalUser = userRepository.findById(ownerId);
-		User owner = optionalUser.orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, ownerId));
-
+		User owner = userRepository.findById(ownerId)
+				.orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, ownerId));
 		ItemRequest itemRequest = null;
 		if (createItemRequest.getRequestId() != null) {
-			Optional<ItemRequest> optionalItemRequest = itemRequestRepository.findById(createItemRequest.getRequestId());
-			itemRequest = optionalItemRequest.orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_REQUEST_BY_ID, createItemRequest.getRequestId()));
+			itemRequest = itemRequestRepository.findById(createItemRequest.getRequestId())
+					.orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_REQUEST_BY_ID, createItemRequest.getRequestId()));
 		}
 		return ItemMapper.toItemDto(
 				itemRepository.saveAndFlush(
@@ -74,8 +69,8 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public ItemDto updateItem(Long itemId, UpdateItemRequest itemRequest, Long userId) {
-		Item item = itemRepository.findByIdAndOwnerId(itemId, userId).orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_BY_ID, itemId));
-
+		Item item = itemRepository.findByIdAndOwnerId(itemId, userId)
+				.orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_BY_ID, itemId));
 		if (itemRequest.getName() != null && !itemRequest.getName().isBlank()) {
 			item.setName(itemRequest.getName());
 		}
@@ -95,6 +90,7 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public Collection<ItemOwnerDto> getItemsByUser(Long userId) {
+		userRepository.findById(userId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, userId));
 		Collection<Item> items = itemRepository.findAllByOwnerId(userId);
 		Collection<Booking> bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
 		Collection<Comment> comments = commentRepository.findAllByItemIdIn(
@@ -120,11 +116,10 @@ public class ItemServiceImpl implements ItemService {
 	@Override
 	public CommentDto addComment(CommentDto commentDto, Long itemId, Long userId) {
 		Comment comment = CommentMapper.fromCommentDto(commentDto);
-		Optional<User> optionalUser = userRepository.findById(userId);
-		comment.setAuthor(optionalUser.orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, userId)));
-
-		Optional<Item> optionalItem = itemRepository.findById(itemId);
-		comment.setItem(optionalItem.orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_BY_ID, itemId)));
+		comment.setAuthor(userRepository.findById(userId)
+				.orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, userId)));
+		comment.setItem(itemRepository.findById(itemId)
+				.orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_BY_ID, itemId)));
 		comment.setCreated(LocalDateTime.now());
 
 		if (bookingRepository
