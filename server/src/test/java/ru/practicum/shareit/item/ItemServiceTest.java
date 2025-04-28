@@ -124,6 +124,7 @@ public class ItemServiceTest {
 
 	@Test
 	void getItem() {
+		User user = UserMapper.fromUserDto(getNewUserDto());
 		Item item = Item.builder()
 				.id(itemCount++)
 				.name("name")
@@ -136,12 +137,14 @@ public class ItemServiceTest {
 				.item(item)
 				.build();
 
+		when(userRepository.findById(user.getId()))
+				.thenReturn(Optional.of(user));
 		when(itemRepository.findById(item.getId()))
 				.thenReturn(Optional.of(item));
 		when(commentRepository.findAllByItemIdIn(Set.of(item.getId())))
 				.thenReturn(List.of(comment));
 
-		ItemDto itemDto = itemService.getItem(item.getId());
+		ItemDto itemDto = itemService.getItem(item.getId(), user.getId());
 
 		assertNotNull(itemDto);
 		assertEquals(item.getId(), itemDto.getId());

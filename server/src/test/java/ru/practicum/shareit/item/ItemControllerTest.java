@@ -149,7 +149,7 @@ public class ItemControllerTest {
 				.isAvailable(true)
 				.build();
 
-		when(itemService.getItem(itemDto.getId()))
+		when(itemService.getItem(itemDto.getId(), userDto.getId()))
 				.thenReturn(itemDto);
 
 		mockMvc.perform(get("/items/" + itemDto.getId())
@@ -164,7 +164,7 @@ public class ItemControllerTest {
 				.andExpect(jsonPath("$.description").value(itemDto.getDescription()));
 
 		Mockito.verify(itemService, Mockito.times(1))
-				.getItem(itemDto.getId());
+				.getItem(itemDto.getId(), userDto.getId());
 	}
 
 	@Test
@@ -208,7 +208,7 @@ public class ItemControllerTest {
 				.build();
 		String searchText = "name";
 
-		when(itemService.search(searchText))
+		when(itemService.search(searchText, userDto.getId()))
 				.thenReturn(List.of(itemDto));
 
 		mockMvc.perform(get("/items/search?text=" + searchText)
@@ -223,7 +223,7 @@ public class ItemControllerTest {
 				.andExpect(jsonPath("$[*].description").value(itemDto.getDescription()));
 
 		Mockito.verify(itemService, Mockito.times(1))
-				.search(searchText);
+				.search(searchText, userDto.getId());
 	}
 
 	private UserDto getNewUserDto() {

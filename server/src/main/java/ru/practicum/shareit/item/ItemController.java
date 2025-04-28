@@ -37,13 +37,13 @@ public class ItemController {
 	@GetMapping("/{itemId}")
 	public ItemDto get(@RequestHeader("X-Sharer-User-Id") long userId,
 					   @PathVariable long itemId) {
-		return itemService.getItem(itemId);
+		return itemService.getItem(itemId, userId);
 	}
 
 	@GetMapping("/search")
 	public Collection<ItemDto> search(@RequestHeader("X-Sharer-User-Id") long userId,
 									  @RequestParam("text") String text) {
-		return itemService.search(text);
+		return itemService.search(text, userId);
 	}
 
 	@PostMapping

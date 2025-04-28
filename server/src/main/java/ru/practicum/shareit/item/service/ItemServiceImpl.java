@@ -47,7 +47,8 @@ public class ItemServiceImpl implements ItemService {
 	private final ItemRequestRepository itemRequestRepository;
 
 	@Override
-	public ItemDto getItem(Long id) {
+	public ItemDto getItem(Long id, Long userId) {
+		userRepository.findById(userId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, userId));
 		Item item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM_BY_ID, id));
 		Collection<Comment> comments = commentRepository.findAllByItemIdIn(Set.of(id));
 		return ItemMapper.toItemDto(item, comments);
@@ -104,7 +105,8 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 	@Override
-	public Collection<ItemDto> search(String name) {
+	public Collection<ItemDto> search(String name, Long userId) {
+		userRepository.findById(userId).orElseThrow(() -> new NotFoundException(NOT_FOUND_USER_BY_ID, userId));
 		if (name == null || name.isBlank()) {
 			return List.of();
 		}
